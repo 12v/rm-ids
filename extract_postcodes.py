@@ -10,7 +10,8 @@ with open(csv_file, 'r', encoding='utf-8') as f:
     reader = csv.DictReader(f)
     for row in reader:
         postcode = row.get('pcds', '').strip()
-        if postcode:
+        doterm = row.get('doterm', '').strip()
+        if postcode and not doterm:
             postcodes.add(postcode)
 
 with open(output_file, 'w', encoding='utf-8') as f:
