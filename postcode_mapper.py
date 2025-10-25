@@ -6,13 +6,10 @@ from pathlib import Path
 
 BASE_URL = "https://los.rightmove.co.uk/typeahead"
 
+
 def fetch_postcode_id(postcode):
     """Fetch ID for a given postcode from Rightmove API."""
-    params = {
-        "query": postcode,
-        "limit": 10,
-        "exclude": "STREET"
-    }
+    params = {"query": postcode, "limit": 10, "exclude": "STREET"}
 
     try:
         response = requests.get(BASE_URL, params=params, timeout=10)
@@ -28,8 +25,9 @@ def fetch_postcode_id(postcode):
         print(f"Error fetching postcode {postcode}: {e}")
         return None
 
+
 def main():
-    postcodes_file = Path("local-postcodes.txt")
+    postcodes_file = Path("postcodes.txt")
     csv_file = Path("postcode-mapping.csv")
 
     # Load existing mapping if it exists
@@ -45,17 +43,19 @@ def main():
         postcodes = [line.strip() for line in f if line.strip()]
 
     # Fetch IDs for each postcode
-    for postcode in postcodes:
+    total = len(postcodes)
+    for i, postcode in enumerate(postcodes, 1):
+        if (i - 1) % 1000 == 0:
+            print(f"\nProgress: {i}/{total} postcodes")
+
         if postcode not in mapping:
-            print(f"Fetching ID for {postcode}...")
             postcode_id = fetch_postcode_id(postcode)
             if postcode_id:
                 mapping[postcode] = postcode_id
-                print(f"  → {postcode}: {postcode_id}")
             else:
-                print(f"  → {postcode}: No ID found")
+                print(f"  No ID found for {postcode}")
         else:
-            print(f"Skipping {postcode} (already mapped)")
+            pass  # Already mapped
 
     # Write mapping to CSV
     with open(csv_file, "w", newline="") as f:
@@ -65,6 +65,7 @@ def main():
             writer.writerow([postcode, postcode_id])
 
     print(f"\nMapping saved to {csv_file}")
+
 
 if __name__ == "__main__":
     main()
