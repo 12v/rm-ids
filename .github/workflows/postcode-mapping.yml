@@ -19,6 +19,9 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
       - name: Process postcodes
         run: python postcode_mapper.py
 
@@ -26,6 +29,6 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add postcode-mapping.json
+          git add postcode-mapping.csv
           git commit -m "Update postcode to ID mapping" || true
           git push
