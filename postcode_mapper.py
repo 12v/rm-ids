@@ -8,22 +8,22 @@ BASE_URL = "https://los.rightmove.co.uk/typeahead"
 
 
 def fetch_postcode_id(postcode):
-    """Fetch ID for a given postcode from Rightmove API."""
+    """Fetch ID for a given postcode from Rightmove API.
+
+    Returns the ID if a match is found, None if no matches exist.
+    Raises RequestException if the API call fails.
+    """
     params = {"query": postcode, "limit": 10, "exclude": "STREET"}
 
-    try:
-        response = requests.get(BASE_URL, params=params, timeout=10)
-        response.raise_for_status()
-        data = response.json()
+    response = requests.get(BASE_URL, params=params, timeout=10)
+    response.raise_for_status()
+    data = response.json()
 
-        # Extract ID from the first match if available
-        matches = data.get("matches", [])
-        if matches and len(matches) > 0:
-            return matches[0].get("id")
-        return None
-    except requests.RequestException as e:
-        print(f"Error fetching postcode {postcode}: {e}")
-        return None
+    # Extract ID from the first match if available
+    matches = data.get("matches", [])
+    if matches and len(matches) > 0:
+        return matches[0].get("id")
+    return None
 
 
 def main():
